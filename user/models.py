@@ -11,6 +11,11 @@ class User(AbstractUser):
 
     username = None
     email = models.EmailField('email address', unique=True)
+    is_staff = models.BooleanField(
+        null=True,
+        blank=True,
+        default=True
+    )
 
     objects = CustomUserManager()
 

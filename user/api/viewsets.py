@@ -1,6 +1,7 @@
 from django.contrib.auth.hashers import make_password
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from user.models import User
 from user.api.serializers import UserSerializer
@@ -10,7 +11,7 @@ from user.permissions import UserPermission
 class UserViewset(ModelViewSet):
     serializer_class = UserSerializer
     # authentication_classes = [TokenAuthentication]
-    # permission_classes = [UserPermission]
+    permission_classes = [IsAdminUser]
 
     def get_queryset(self):
         return User.objects.all()

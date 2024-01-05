@@ -80,7 +80,6 @@ class MicrosoftViewSet(viewsets.ModelViewSet):
 
         if subfolder_name:
             upload_url = f'{url}/{folder_name}/{subfolder_name}/{file.name}:/content'
-        else:
             upload_url = f'{url}/{folder_name}/{file.name}:/content'
 
         media_content = file.read()
@@ -115,6 +114,7 @@ class MicrosoftViewSet(viewsets.ModelViewSet):
             return Response(f"Failed to upload file: {str(error)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=False, methods=['get'])
+    
     def list_files(self, request):
         access_token = request.data.get('access_token', '')
         folder = request.data.get('folder', '')
