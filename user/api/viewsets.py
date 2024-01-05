@@ -10,7 +10,7 @@ from user.permissions import UserPermission
 
 class UserViewset(ModelViewSet):
     serializer_class = UserSerializer
-    # authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAdminUser]
 
     def get_queryset(self):
@@ -28,7 +28,10 @@ class UserViewset(ModelViewSet):
             email=data['email'],
             password=hashed_password,
             first_name=data['first_name'],
-            last_name=data['last_name']
+            last_name=data['last_name'],
+            folder_name=data['folder_name'],
+            phone=data['phone'],
+            cpf_cnpj=data['cpf_cnpj']
         )
         serializer = UserSerializer(user)
 

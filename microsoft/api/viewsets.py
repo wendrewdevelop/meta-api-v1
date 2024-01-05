@@ -2,22 +2,29 @@ import httpx
 import requests
 from decouple import config
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, permission_classes
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAdminUser
 from user.permissions import UserPermission
 from microsoft.api.serializers import MicrosoftSerializer
 from files.models import File
 from meta.utils import get_folder_id_by_name, list_items_in_drive
 
 
-class MicrosoftViewSet(viewsets.ModelViewSet):
+class MicrosoftViewSet(viewsets.ViewSet):
     serializer_class = MicrosoftSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [UserPermission]
 
     def get_queryset(self):
         return File.objects.all()
+    
+    def get_permissions(self):
+        if self.action == 'upload_file':
+            return [IsAdminUser()]
+        return super().get_permissions()
+
 
     @action(detail=False, methods=['get'])
     def get_token(self, request):
@@ -57,9 +64,8 @@ class MicrosoftViewSet(viewsets.ModelViewSet):
         
     @action(detail=False, methods=['post'])
     def upload_file(self, request):
-        serializer = MicrosoftSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
+        
+        default_user_folder = self.request.user.folder_name
         access_token = self.request.data.get('access_token')
         user_id = self.request.data['user']
         folder_name = self.request.data['folder_name']
@@ -79,8 +85,9 @@ class MicrosoftViewSet(viewsets.ModelViewSet):
             return Response("Folder not found.", status=status.HTTP_404_NOT_FOUND)
 
         if subfolder_name:
-            upload_url = f'{url}/{folder_name}/{subfolder_name}/{file.name}:/content'
-            upload_url = f'{url}/{folder_name}/{file.name}:/content'
+            upload_url = f'{url}/{default_user_folder}/{folder_name}/{subfolder_name}/{file.name}:/content'
+        else:
+            upload_url = f'{url}/{default_user_folder}/{folder_name}/{file.name}:/content'
 
         media_content = file.read()
 
@@ -114,13 +121,13 @@ class MicrosoftViewSet(viewsets.ModelViewSet):
             return Response(f"Failed to upload file: {str(error)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=False, methods=['get'])
-    
     def list_files(self, request):
         access_token = request.data.get('access_token', '')
         folder = request.data.get('folder', '')
+        subfolder = request.data.get('subfolder', '')
+        default_user_folder = self.request.user.folder_name
 
-        items_in_drive = list_items_in_drive(access_token, folder)
-        print(f'ITEMS IN DRIVE::: {items_in_drive}')
+        items_in_drive = list_items_in_drive(access_token, folder, default_user_folder, subfolder)
 
         return Response(items_in_drive)
     

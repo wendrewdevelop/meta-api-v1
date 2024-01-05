@@ -4,6 +4,4 @@ from files.models import File
 
 
 class MicrosoftSerializer(serializers.Serializer):
-    class Meta:
-        model = File
-        fields = '__all__'
+    pass

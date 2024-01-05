@@ -16,6 +16,21 @@ class User(AbstractUser):
         blank=True,
         default=True
     )
+    folder_name = models.CharField(
+        max_length=150,
+        null=True,
+        blank=True
+    )
+    phone = models.CharField(
+        max_length=150,
+        null=True,
+        blank=True
+    )
+    cpf_cnpj = models.CharField(
+        max_length=150,
+        null=True,
+        blank=True
+    )
 
     objects = CustomUserManager()
 

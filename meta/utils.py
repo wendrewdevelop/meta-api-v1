@@ -152,7 +152,9 @@ def get_subfolder_id_by_name(token: str, parent_folder_id, subfolder: str = None
     return {"folder_id": folder_id}
 
 
-def list_items_in_drive(token: str, folder_name: str):
+def list_items_in_drive(token: str, folder_name: str, default_folder: str, subfolder: str = None):
+    print(f'DEFAULT USER FOLDER::: {default_folder}')
+    folder_path = f"{default_folder}/{folder_name}/{subfolder}" if subfolder else f"{default_folder}/{folder_name}"
     items = []
 
     with httpx.Client() as client:
@@ -163,7 +165,8 @@ def list_items_in_drive(token: str, folder_name: str):
 
         # Make a request to list items in the root of the user's drive
         response = client.get(
-            f"https://graph.microsoft.com/v1.0/drives/{drive_id}/root:/{folder_name}:/children",
+            # f"https://graph.microsoft.com/v1.0/drives/{drive_id}/root:/{default_folder}:/{folder_name}:/children",
+            f"https://graph.microsoft.com/v1.0/drives/{drive_id}/root:/{folder_path}:/children",
             headers=headers
         )
 
