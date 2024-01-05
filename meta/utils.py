@@ -154,6 +154,8 @@ def get_subfolder_id_by_name(token: str, parent_folder_id, subfolder: str = None
 
 def list_items_in_drive(token: str, folder_name: str, default_folder: str, subfolder: str = None):
     print(f'DEFAULT USER FOLDER::: {default_folder}')
+    # microsoft OneDrive API just accept a single path to folder, so we created a default folder path,
+    # i.e. the var below contains the full path folder configuration to user folder and subfolder if exists.
     folder_path = f"{default_folder}/{folder_name}/{subfolder}" if subfolder else f"{default_folder}/{folder_name}"
     items = []
 
