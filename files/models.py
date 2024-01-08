@@ -1,9 +1,16 @@
 import traceback
+import uuid
+from datetime import datetime, timedelta
 from django.db import models
 from user.models import User
 
 
 class File(models.Model):
+    id = models.UUIDField(
+        primary_key=True, 
+        default=uuid.uuid4,
+        editable=False
+    )
     file_name = models.CharField(
         'nome do arquivo',
         max_length=100, 
@@ -24,6 +31,10 @@ class File(models.Model):
         blank=True,
         null=True
     )
+    expire_notification = models.DateField(
+        blank=True,
+        null=True
+    )
     user = models.ForeignKey(
         User,
         on_delete=models.PROTECT
@@ -36,15 +47,21 @@ class File(models.Model):
 
 
     def register_file(files):
-        query = File.objects.create(
-            file_name=files.get("file_name"),
-            folder_name=files.get("folder_name"),
-            uploaded_at=files.get("uploaded_at"),
-            expires_at=files.get("expires_at"),
-            user_id=files.get("user_id"),
-            period_to_expiration=files.get("period_to_expiration") if files.get("period_to_expiration") else 30
-        )
+        uploaded_at = datetime.strptime(files.get("uploaded_at"), '%Y-%m-%d')
+        expires_at=datetime.strptime(files.get("expires_at"), '%Y-%m-%d')
+        period_to_expiration = int(files.get("period_to_expiration")) if files.get("period_to_expiration") else 30
+        expire_notification = expires_at - timedelta(days=period_to_expiration)
+
         try:
+            query = File.objects.create(
+                file_name=files.get("file_name"),
+                folder_name=files.get("folder_name"),
+                uploaded_at=uploaded_at,
+                expires_at=expires_at,
+                user_id=files.get("user_id"),
+                period_to_expiration=period_to_expiration,
+                expire_notification=expire_notification
+            )
             query.save()
             return query
         except Exception as error:

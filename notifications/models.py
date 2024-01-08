@@ -1,9 +1,15 @@
+import uuid
 from django.db import models
 from user.models import User
 from files.models import File
 
 
 class Notification(models.Model):
+    id = models.UUIDField(
+        primary_key=True, 
+        default=uuid.uuid4,
+        editable=False
+    )
     file_expiration_date = models.CharField(
         'data de expiração do arquivo',
         max_length=100

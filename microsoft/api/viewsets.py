@@ -67,7 +67,6 @@ class MicrosoftViewSet(viewsets.ViewSet):
         
         default_user_folder = self.request.user.folder_name
         access_token = self.request.data.get('access_token')
-        user_id = self.request.data['user']
         folder_name = self.request.data['folder_name']
         uploaded_at = self.request.data['uploaded_at']
         expires_at = self.request.data['expires_at']
@@ -75,7 +74,7 @@ class MicrosoftViewSet(viewsets.ViewSet):
         file = self.request.data['file']
         subfolder_name = self.request.data.get('subfolder_name')
 
-        drive_id = config('drive_id')  # Replace with your actual drive_id
+        drive_id = config('drive_id')
 
         upload_url = ''
         url = f"https://graph.microsoft.com/v1.0/drives/{drive_id}/items/root:"
@@ -107,7 +106,7 @@ class MicrosoftViewSet(viewsets.ViewSet):
 
             if response.status_code == 201 or response.status_code == 200:
                 metadata = {
-                    "user_id": user_id,
+                    "user_id": self.request.user.id,
                     "file_name": file.name,
                     "folder_name": folder_name,
                     "uploaded_at": uploaded_at,
