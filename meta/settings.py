@@ -24,12 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-%k#v#lgq#f*prk8=1o*ksnc1axkdl&0ofv!#1dpco8f+swdtsh'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
 	"149.100.142.57",
-	"https://api.metasolucoesambientais.com.br"
-
+	"https://api.metasolucoesambientais.com.br",
+    "127.0.0.1"
 ]
 
 
@@ -54,6 +54,7 @@ PROJECT_APP = [
 THIRD_PARTY_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_spectacular'
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + PROJECT_APP + THIRD_PARTY_APPS
@@ -155,6 +156,7 @@ REST_FRAMEWORK = {
         'anon': '100/day',
         'user': '100/day'
     },
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 50
 }
@@ -180,3 +182,12 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     # Add other allowed origins as needed
 ]
+
+# DRF SWAGGER DOC CONFIGURATION USING SPECTACULAR LIB.
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'META API',
+    'DESCRIPTION': 'OneDrive Meta API',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}
