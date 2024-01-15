@@ -35,6 +35,12 @@ class File(models.Model):
         blank=True,
         null=True
     )
+    status = models.CharField(
+        'Status do arquivo',
+        max_length=100,
+        blank=True,
+        null=True
+    )
     user = models.ForeignKey(
         User,
         on_delete=models.PROTECT
@@ -60,7 +66,8 @@ class File(models.Model):
                 expires_at=expires_at,
                 user_id=files.get("user_id"),
                 period_to_expiration=period_to_expiration,
-                expire_notification=expire_notification
+                expire_notification=expire_notification,
+                status="active"
             )
             query.save()
             return query

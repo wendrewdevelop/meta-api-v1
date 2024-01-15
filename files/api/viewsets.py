@@ -1,5 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.decorators import action
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.response import Response
 from files.models import File
 from files.api.serializers import FileSerializer
 from user.permissions import UserPermission
@@ -30,3 +32,17 @@ class FileViewset(ModelViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         return super(FileViewset, self).partial_update(request, *args, **kwargs)
+    
+    @action(detail=False, methods=["POST"])
+    def update_file_status(self, request):
+        file_id = request.data.get("file_id")
+        file_object = File.objects.get(id=file_id)
+
+        try:
+            file_object.status = request.data.get("status")
+            file_object.save()
+
+            return Response({"Message": f"Status do arquivo ({file_object.file_name}) foi atualizado com sucesso!"})
+        except Exception as error:
+            print(error)
+            return Response({"Message": f"Status do arquivo ({file_object.file_name}) não pode ser atualizado!"})
