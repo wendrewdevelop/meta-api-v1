@@ -24,7 +24,7 @@ class File(models.Model):
         null=True
     )
     uploaded_at = models.DateField(auto_now_add=True)
-    expires_at = models.DateField(auto_now_add=True)
+    expires_at = models.DateField()
     period_to_expiration = models.CharField(
         'periodo (em dias) de expiração do arquivo',
         max_length=100, 

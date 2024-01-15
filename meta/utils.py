@@ -3,11 +3,14 @@ import base64
 import smtplib
 import os
 import secrets
+import traceback
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from datetime import datetime, timedelta
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.shortcuts import render
 
 
 # OAuth Microsoft Configuration
@@ -23,13 +26,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60
 state = secrets.token_urlsafe(16)
 drive_id = '4cb9b710-d164-45d6-838e-ae8e66070056'
 URL = f'http://localhost:8000' if not "production" in os.environ else f'http://193.203.174.195:8000'
-
-# Configuração do servidor SMTP
-SMTP_SERVER = "smtps.uol.com.br"
-SMTP_PORT = 587
-SMTP_USERNAME = "notificacao@metasolucoesambientais.com.br"
-SMTP_PASSWORD = "Meta33650913@"
-
 
 async def exchange_code_for_token(code: str):
     token_url = f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token"
@@ -196,17 +192,22 @@ async def encode_file_to_base64(file):
         return None
     
 
-def enviar_email(destinatario, assunto, corpo):
-    mensagem = MIMEMultipart()
-    mensagem["From"] = SMTP_USERNAME
-    mensagem["To"] = destinatario
-    mensagem["Subject"] = assunto
-    mensagem.attach(MIMEText(corpo, "html"))
+def _send_email(message, recipients):
+    subject = 'Meta - Notificação de expiração de documento.'
+    from_email = 'notificacao@metasolucoes.com.br'
+    recipient_list = [recipients]
 
-    with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as servidor_smtp:
-        #servidor_smtp.starttls()
-        servidor_smtp.login(SMTP_USERNAME, SMTP_PASSWORD)
-        servidor_smtp.sendmail(SMTP_USERNAME, destinatario, mensagem.as_string())
+    try:
+        send_mail(
+            subject, 
+            message, 
+            from_email, 
+            recipient_list, 
+            fail_silently=False,
+        )
+    except Exception as error:
+        print(f"Error sending email: {error}")
+        traceback.print_exc()
 
 
 def format_date(raw_date: str):

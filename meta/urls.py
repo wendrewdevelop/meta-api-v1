@@ -29,6 +29,7 @@ from drf_spectacular.views import (
 from files.api.viewsets import FileViewset
 from microsoft.api.viewsets import MicrosoftViewSet
 from user.api.viewsets import UserViewset
+from notifications.api.viewsets import NotificationViewset
 
 
 router = routers.DefaultRouter()
@@ -46,6 +47,11 @@ router.register(
     r'microsoft', 
     MicrosoftViewSet, 
     basename='Microsoft'
+)
+router.register(
+    r'notification',
+    NotificationViewset,
+    basename='Notification'
 )
 
 urlpatterns = [
