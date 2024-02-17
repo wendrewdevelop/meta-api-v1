@@ -24,12 +24,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-%k#v#lgq#f*prk8=1o*ksnc1axkdl&0ofv!#1dpco8f+swdtsh'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
 	"149.100.142.57",
 	"https://api.metasolucoesambientais.com.br",
-    "127.0.0.1"
+	"127.0.0.1",
+	"api.metasolucoesambientais.com.br:8000",
+	"api.metasolucoesambientais.com.br"
 ]
 
 
