@@ -195,8 +195,9 @@ SPECTACULAR_SETTINGS = {
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.uol.com.br'
+EMAIL_HOST = 'smtp.office365.com' #'smtp.uhserver.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'notificacao@metasolucoesambientais.com.br'
-EMAIL_HOST_PASSWORD = 'Meta33650913@'
+EMAIL_HOST_USER = 'wendrewoliveira@onemancompany682.onmicrosoft.com' #'notificacao@metasolucoesambientais.com.br'
+EMAIL_HOST_PASSWORD = 'Mynameisdrew1_' #'Meta33650913@'
+EMAIL_USE_OAUTH2 = True

@@ -9,7 +9,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from datetime import datetime, timedelta
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
+from django.core.mail import send_mail, send_mass_mail
 from django.shortcuts import render
 
 
@@ -194,7 +194,7 @@ async def encode_file_to_base64(file):
 
 def _send_email(message, recipients):
     subject = 'Meta - Notificação de expiração de documento.'
-    from_email = 'notificacao@metasolucoes.com.br'
+    from_email = 'wendrewoliveira@onemancompany682.onmicrosoft.com'
     recipient_list = [recipients]
 
     try:
@@ -202,8 +202,8 @@ def _send_email(message, recipients):
             subject, 
             message, 
             from_email, 
-            recipient_list, 
-            fail_silently=False,
+            recipient_list,
+            fail_silently=False
         )
     except Exception as error:
         print(f"Error sending email: {error}")
