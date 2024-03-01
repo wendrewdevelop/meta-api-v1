@@ -17,7 +17,7 @@ from django.shortcuts import render
 client_id = "82d6aea6-5d83-41de-9a32-58758704def1"
 client_secret = "Uwx8Q~BsjB~o6JDBXXwIKbhiICrR86NmUvBp7a3-"
 tenant_id = "1e5db031-a870-4c8c-b55d-06e4a7a743b1"
-redirect_uri = "http://localhost:8000/callback"
+redirect_uri = "https://api.metasolucoesambientais.com.br/api/v1/callback"
 scope = "https://graph.microsoft.com/.default"
 access_token = None
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
