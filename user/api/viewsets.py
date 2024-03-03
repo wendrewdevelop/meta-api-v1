@@ -17,8 +17,8 @@ from user.api.serializers import UserSerializer, CustomAuthTokenSerializer
 
 class UserViewset(ModelViewSet):
     serializer_class = UserSerializer
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAdminUser]
+    #authentication_classes = [TokenAuthentication]
+    #permission_classes = [IsAdminUser]
 
     def get_permissions(self):
         if self.request.method == 'POST' and self.request.path.endswith('recover_password/'):
@@ -50,7 +50,7 @@ class UserViewset(ModelViewSet):
             password=hashed_password,
             first_name=data['first_name'],
             last_name=data['last_name'],
-            folder_name=data['folder_name'],
+            folder_name=f'{data["first_name"]}_{data["last_name"]}_{data["cpf_cnpj"][:5]}',
             phone=data['phone'],
             cpf_cnpj=data['cpf_cnpj']
         )

@@ -5,8 +5,6 @@ from user.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    folder_name = serializers.CharField(source='user.folder_name', read_only=True)
-
     class Meta:
         model = User
         fields = (
@@ -15,7 +13,6 @@ class UserSerializer(serializers.ModelSerializer):
             'last_name', 
             'email', 
             'password',
-            'folder_name',
             'cpf_cnpj',
             'phone'
         )
@@ -65,6 +62,8 @@ class CustomAuthTokenSerializer(serializers.Serializer):
                         "token": token.key,
                         "user": {
                             "id": user.id,
+		            "first_name": user.first_name,
+			    "last_name": user.last_name,
                             "email": user.email,
                             "is_staff": user.is_staff,
                             "folder_name": user.folder_name,
