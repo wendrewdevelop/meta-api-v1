@@ -28,7 +28,11 @@ from drf_spectacular.views import (
 )
 from files.api.viewsets import FileViewset
 from microsoft.api.viewsets import MicrosoftViewSet
-from user.api.viewsets import UserViewset
+from user.api.viewsets import (
+    UserViewset, 
+    PasswordResetViewSet,
+    CustomObtainAuthToken
+)
 from notifications.api.viewsets import NotificationViewset
 
 
@@ -53,11 +57,17 @@ router.register(
     NotificationViewset,
     basename='Notification'
 )
+router.register(
+    r'forgotpassword',
+    PasswordResetViewSet,
+    basename='PasswordReset'
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include(router.urls)),
-    path('auth/login/', obtain_auth_token),
+    # path('auth/login/', obtain_auth_token),
+    path('auth/login/', CustomObtainAuthToken.as_view(), name='api_token_auth'),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/schema/swagger/", SpectacularSwaggerView.as_view(url_name="schema")),
     path("api/schema/redoc/", SpectacularRedocView.as_view(url_name="schema")),

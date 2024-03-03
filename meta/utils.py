@@ -4,6 +4,8 @@ import smtplib
 import os
 import secrets
 import traceback
+import random
+import string
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
@@ -225,3 +227,8 @@ def format_date(raw_date: str):
                 print("Failed to parse the date.")
         except ValueError:
             pass
+
+
+def generate_temporary_password():
+    temporary_password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+    return temporary_password

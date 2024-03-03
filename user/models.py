@@ -36,6 +36,7 @@ class User(AbstractUser):
         null=True,
         blank=True
     )
+    temporary_password = models.CharField(max_length=128, null=True, blank=True)
 
     objects = CustomUserManager()
 
@@ -51,5 +52,3 @@ class User(AbstractUser):
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
-
-
