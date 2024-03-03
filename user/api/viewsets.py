@@ -23,10 +23,14 @@ class UserViewset(ModelViewSet):
     def get_permissions(self):
         if self.request.method == 'POST' and self.request.path.endswith('recover_password/'):
             return [AllowAny()]
+        if self.request.method == 'POST' and self.request.path.endswith('update_password/'):
+            return [AllowAny()]
         return super().get_permissions()
 
     def get_authenticators(self):
         if self.request.method == 'POST' and self.request.path.endswith('recover_password/'):
+            return []
+        if self.request.method == 'POST' and self.request.path.endswith('update_password/'):
             return []
         return super().get_authenticators()
 
@@ -86,6 +90,19 @@ class UserViewset(ModelViewSet):
             return Response({"message": "Senha temporária enviada para o email fornecido."}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"message": "Erro ao gerar a senha temporaria."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    @action(detail=True, methods=['post'])
+    def update_password(self, request, pk=None):
+        user = self.get_object()
+        password = request.data.get('password')
+
+        if password:
+            hashed_password = make_password(password)
+            user.set_password(hashed_password)
+            user.save()
+            return Response({"message": "Password updated successfully."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "New password not provided."}, status=status.HTTP_400_BAD_REQUEST)
     
 
 class CustomObtainAuthToken(ObtainAuthToken):
