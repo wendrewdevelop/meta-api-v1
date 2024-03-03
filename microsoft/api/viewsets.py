@@ -1,5 +1,7 @@
 import httpx
 import requests
+import traceback
+import unicodedata
 from decouple import config
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, permission_classes
@@ -165,3 +167,69 @@ class MicrosoftViewSet(viewsets.ViewSet):
             print(f"HTTP error: {e}")
 
         return Response({'download_link': download_link})
+
+    @action(detail=False, methods=['post'])
+    def create_folder(self, request):
+        access_token = request.data.get('access_token')
+        folder_name = request.data.get('folder_name')
+        subfolder_name = request.data.get('subfolder_name')
+
+        # Define drive_id and other necessary variables here
+        drive_id = config('drive_id')
+
+        # Your existing logic here to create the folder
+        try:
+            root_folder_id = get_folder_id_by_name(access_token, folder_name)
+
+            headers = {
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/json"
+            }
+
+            if root_folder_id.get('folder_id') != '':
+                if subfolder_name:
+                    normalized_subfolder_name = ''.join([c for c in unicodedata.normalize('NFD', subfolder_name) if not unicodedata.combining(c)])
+                    normalized_subfolder_name = normalized_subfolder_name.replace(' ', '').lower()
+
+                    data = {
+                        "name": normalized_subfolder_name,
+                        "folder": {}
+                    }
+
+                    # Make the request using httpx
+                    response = httpx.post(
+                        f"https://graph.microsoft.com/v1.0/drives/{drive_id}/items/{root_folder_id.get('folder_id')}/children",
+                        headers=headers,
+                        json=data
+                    )
+
+                    # Check the response status code
+                    if response.status_code == 201:
+                        return Response({"Message": "Folder created!"}, status=status.HTTP_201_CREATED)
+                    else:
+                        # Handle HTTP errors here
+                        print(f"HTTP error: {response.text}")
+                else:
+                    return Response({"Message": "A folder with that name already exists. Try again using another name!"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                data = {
+                    "name": folder_name,
+                    "folder": {}
+                }
+
+                # Make the request using httpx
+                response = httpx.post(
+                    f"https://graph.microsoft.com/v1.0/drives/{drive_id}/root/children",
+                    headers=headers,
+                    json=data
+                )
+
+                # Check the response status code
+                if response.status_code == 201:
+                    return Response({"Message": "Folder created!"}, status=status.HTTP_201_CREATED)
+                else:
+                    # Handle HTTP errors here
+                    print(f"HTTP error: {response.text}")
+        except Exception:
+            traceback.print_exc()
+            return Response({"Message": "An error occurred while creating the folder."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
