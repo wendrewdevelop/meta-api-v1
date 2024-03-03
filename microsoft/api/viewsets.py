@@ -123,9 +123,9 @@ class MicrosoftViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=['get'])
     def list_files(self, request):
-        access_token = request.data.get('access_token', '')
-        folder = request.data.get('folder', '')
-        subfolder = request.data.get('subfolder', '')
+        access_token = request.query_params.get('access_token', '')
+        folder = request.query_params.get('folder', '')
+        subfolder = request.query_params.get('subfolder', '')
         default_user_folder = self.request.user.folder_name
 
         items_in_drive = list_items_in_drive(access_token, folder, default_user_folder, subfolder)
@@ -134,10 +134,10 @@ class MicrosoftViewSet(viewsets.ViewSet):
     
     @action(detail=False, methods=['get'])
     def download_file(self, request):
-        access_token = self.request.data.get('access_token')
-        folder = self.request.data.get('folder')
-        item_name = self.request.data.get('item_name')
-        subfolder_name = self.request.data.get('subfolder_name')
+        access_token = self.request.query_params.get('access_token')
+        folder = self.request.query_params.get('folder')
+        item_name = self.request.query_params.get('item_name')
+        subfolder_name = self.request.query_params.get('subfolder_name')
 
         download_link = ''
         drive_id = config('drive_id')
