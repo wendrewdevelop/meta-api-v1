@@ -30,7 +30,6 @@ from files.api.viewsets import FileViewset
 from microsoft.api.viewsets import MicrosoftViewSet
 from user.api.viewsets import (
     UserViewset, 
-    PasswordResetViewSet,
     CustomObtainAuthToken
 )
 from notifications.api.viewsets import NotificationViewset
@@ -56,11 +55,6 @@ router.register(
     r'notification',
     NotificationViewset,
     basename='Notification'
-)
-router.register(
-    r'forgotpassword',
-    PasswordResetViewSet,
-    basename='PasswordReset'
 )
 
 urlpatterns = [

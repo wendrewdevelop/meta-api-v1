@@ -42,36 +42,43 @@ class CustomAuthTokenSerializer(serializers.Serializer):
     def validate(self, attrs):
         email = attrs.get("email")
         password = attrs.get("password")
+        user = User.objects.get(email=email)
 
         if email and password:
-            user = authenticate(request=self.context.get("request"), email=email, password=password)
-
             if not user:
                 msg = "Unable to log in with provided credentials."
                 raise serializers.ValidationError(msg, code="authorization")
-
-            token, _ = Token.objects.get_or_create(user=user)
-
-            # Customize the data to return along with the token
-            data = {
-                "token": token.key,
-                "user": {
-                    "id": user.id,
-                    "email": user.email,
-                    "is_staff": user.is_staff,
-                    "folder_name": user.folder_name,
-                    "phone": user.phone,
-                    "cpf_cnpj": user.cpf_cnpj,
-                    # Add more fields as needed
-                }
-            }
+            else:
+                token, _ = Token.objects.get_or_create(user=user)
+                if password == user.temporary_password:
+                    msg = "You are using a temporary password. Please change it."
+                    data = {
+                        "token": token.key,
+                        "user": {
+                            "id": user.id,
+                            "email": user.email,
+                            "temporary_password": True
+                        }
+                    }
+                else:
+                    data = {
+                        "token": token.key,
+                        "user": {
+                            "id": user.id,
+                            "email": user.email,
+                            "is_staff": user.is_staff,
+                            "folder_name": user.folder_name,
+                            "phone": user.phone,
+                            "cpf_cnpj": user.cpf_cnpj
+                        }
+                    }
             return data
         else:
             msg = "Must include 'email' and 'password'."
             raise serializers.ValidationError(msg, code="authorization")
-    
 
-class UserPasswordResetSerializer(serializers.Serializer):
+    
+class PasswordRecoverySerializer(serializers.Serializer):
     email = serializers.EmailField()
 
     def validate_email(self, value):
