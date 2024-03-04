@@ -91,8 +91,11 @@ class MicrosoftViewSet(viewsets.ViewSet):
         if folder_id is None:
             return Response("Folder not found.", status=status.HTTP_404_NOT_FOUND)
 
-        if subfolder_name:
-            upload_url = f'{url}/{default_user_folder}/{folder_name}/{subfolder_name}/{file.name}:/content'
+        if folder_name:
+            if subfolder_name:
+                upload_url = f'{url}/{default_user_folder}/{folder_name}/{subfolder_name}/{file.name}:/content'
+            else:
+                upload_url = f'{url}/{default_user_folder}/{folder_name}/{file.name}:/content'
         else:
             upload_url = f'{url}/{default_user_folder}/{file.name}:/content'
 
