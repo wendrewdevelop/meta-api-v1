@@ -21,10 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-
-        # If user is_staff is True, include the 'folder_name' in the response
-        if instance.is_staff:
-            data['folder_name'] = instance.folder_name
+        data['folder_name'] = instance.folder_name
 
         return data
     

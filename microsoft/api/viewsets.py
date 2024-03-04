@@ -7,7 +7,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action, permission_classes
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, AllowAny
 from user.permissions import UserPermission
 from microsoft.api.serializers import MicrosoftSerializer
 from files.models import File
@@ -19,14 +19,20 @@ class MicrosoftViewSet(viewsets.ViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [UserPermission]
 
-    def get_queryset(self):
-        return File.objects.all()
-    
     def get_permissions(self):
+        if self.request.method == 'GET' and self.request.path.endswith('get_token/'):
+            return [AllowAny()]
         if self.action == 'upload_file':
             return [IsAdminUser()]
         return super().get_permissions()
 
+    def get_authenticators(self):
+        if self.request.method == 'GET' and self.request.path.endswith('get_token/'):
+            return []
+        return super().get_authenticators()
+
+    def get_queryset(self):
+        return File.objects.all()
 
     @action(detail=False, methods=['get'])
     def get_token(self, request):
@@ -170,15 +176,14 @@ class MicrosoftViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['post'])
     def create_folder(self, request):
         access_token = request.data.get('access_token')
-        folder_name = request.data.get('folder_name')
+        default_user_folder = self.request.user.folder_name
         subfolder_name = request.data.get('subfolder_name')
 
-        # Define drive_id and other necessary variables here
         drive_id = config('drive_id')
 
-        # Your existing logic here to create the folder
         try:
-            root_folder_id = get_folder_id_by_name(access_token, folder_name)
+            root_folder_id = get_folder_id_by_name(access_token, default_user_folder)
+            print(f'DEFAULT USER FOLDER ID::: {root_folder_id}')
 
             headers = {
                 "Authorization": f"Bearer {access_token}",
@@ -195,39 +200,33 @@ class MicrosoftViewSet(viewsets.ViewSet):
                         "folder": {}
                     }
 
-                    # Make the request using httpx
                     response = httpx.post(
                         f"https://graph.microsoft.com/v1.0/drives/{drive_id}/items/{root_folder_id.get('folder_id')}/children",
                         headers=headers,
                         json=data
                     )
 
-                    # Check the response status code
                     if response.status_code == 201:
                         return Response({"Message": "Folder created!"}, status=status.HTTP_201_CREATED)
                     else:
-                        # Handle HTTP errors here
                         print(f"HTTP error: {response.text}")
                 else:
                     return Response({"Message": "A folder with that name already exists. Try again using another name!"}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 data = {
-                    "name": folder_name,
+                    "name": default_user_folder,
                     "folder": {}
                 }
 
-                # Make the request using httpx
                 response = httpx.post(
                     f"https://graph.microsoft.com/v1.0/drives/{drive_id}/root/children",
                     headers=headers,
                     json=data
                 )
 
-                # Check the response status code
                 if response.status_code == 201:
                     return Response({"Message": "Folder created!"}, status=status.HTTP_201_CREATED)
                 else:
-                    # Handle HTTP errors here
                     print(f"HTTP error: {response.text}")
         except Exception:
             traceback.print_exc()

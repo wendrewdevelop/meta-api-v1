@@ -1,5 +1,7 @@
 import random
 import string
+import httpx
+from decouple import config
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail
@@ -43,21 +45,40 @@ class UserViewset(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
+        access_token = request.data.get('access_token')
         hashed_password = make_password(data['password'])
-        folder_name = f'{data["first_name"]}_{data["last_name"]}_{data["cpf_cnpj"][:5]}'
+        default_user_folder = f'{data["first_name"]}_{data["last_name"]}_{data["cpf_cnpj"][:5]}'
+        data["folder_name"] = default_user_folder.replace(" ", "_")
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json"
+        }
+        drive_id = config('drive_id')
 
-        user = User.objects.create(
-            email=data['email'],
-            password=hashed_password,
-            first_name=data['first_name'],
-            last_name=data['last_name'],
-            folder_name=folder_name.replace(" ", "_"),
-            phone=data['phone'],
-            cpf_cnpj=data['cpf_cnpj']
-        )
-        serializer = UserSerializer(user)
+        try:
+            user = User.objects.create(
+                email=data['email'],
+                password=hashed_password,
+                first_name=data['first_name'],
+                last_name=data['last_name'],
+                folder_name=default_user_folder.replace(" ", "_"),
+                phone=data['phone'],
+                cpf_cnpj=data['cpf_cnpj']
+            )
+            serializer = UserSerializer(user)
 
-        return Response(serializer.data)
+            response = httpx.post(
+                f"https://graph.microsoft.com/v1.0/drives/{drive_id}/root/children",
+                headers=headers,
+                json={
+                    "name": default_user_folder.replace(" ", "_"),
+                    "folder": {}
+                }
+            )
+            return Response(serializer.data)
+        except Exception as error:
+            print(error)
+        
 
     def destroy(self, request, *args, **kwargs):
         return super(UserViewset, self).destroy(request, *args, **kwargs)
@@ -113,7 +134,6 @@ class UserViewset(ModelViewSet):
             return Response({"error": "New password not provided."}, status=status.HTTP_400_BAD_REQUEST)
 
     
-
 class CustomObtainAuthToken(ObtainAuthToken):
     serializer_class = CustomAuthTokenSerializer
 
