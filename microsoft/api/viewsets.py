@@ -144,8 +144,10 @@ class MicrosoftViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['get'])
     def download_file(self, request):
         default_user_folder = self.request.user.folder_name
+        print(f'DEFAULT USER FOLDER::: {default_user_folder}')
         access_token = self.request.query_params.get('access_token')
         item_name = self.request.query_params.get('item_name')
+        folder_name = self.request.query_params.get('folder_name')
         subfolder_name = self.request.query_params.get('subfolder_name')
 
         download_link = ''
@@ -158,10 +160,20 @@ class MicrosoftViewSet(viewsets.ViewSet):
             "Authorization": f"Bearer {access_token}"
         }
 
-        if subfolder_name:
-            download_url = f'{url}/{default_user_folder}/{subfolder_name}:/children/{item_name}'
+        # if subfolder_name:
+        #     download_url = f'{url}/{default_user_folder}/{subfolder_name}:/children/{item_name}'
+        # else:
+        #     download_url = f'{url}/{default_user_folder}:/children/{item_name}'
+
+        if folder_name:
+            if subfolder_name:
+                download_url = f'{url}/{default_user_folder}/{folder_name}/{subfolder_name}:/children/{item_name}'
+            else:
+                download_url = f'{url}/{default_user_folder}/{folder_name}:/children/{item_name}'
         else:
             download_url = f'{url}/{default_user_folder}:/children/{item_name}'
+
+        print(f'DOWNLOAD URL::: {download_url}')
 
         try:
             with requests.get(download_url, headers=headers) as response:
