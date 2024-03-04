@@ -43,15 +43,15 @@ class UserViewset(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        print(f'DATA::: {data}')
         hashed_password = make_password(data['password'])
+        folder_name = f'{data["first_name"]}_{data["last_name"]}_{data["cpf_cnpj"][:5]}'
 
         user = User.objects.create(
             email=data['email'],
             password=hashed_password,
             first_name=data['first_name'],
             last_name=data['last_name'],
-            folder_name=f'{data["first_name"]}_{data["last_name"]}_{data["cpf_cnpj"][:5]}',
+            folder_name=folder_name.replace(" ", "_"),
             phone=data['phone'],
             cpf_cnpj=data['cpf_cnpj']
         )
