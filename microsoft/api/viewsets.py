@@ -91,10 +91,12 @@ class MicrosoftViewSet(viewsets.ViewSet):
         if folder_id is None:
             return Response("Folder not found.", status=status.HTTP_404_NOT_FOUND)
 
+        if folder_name:
+            upload_url = f'{url}/{default_user_folder}/{folder_name}/{file.name}:/content'
         if subfolder_name:
             upload_url = f'{url}/{default_user_folder}/{folder_name}/{subfolder_name}/{file.name}:/content'
         else:
-            upload_url = f'{url}/{default_user_folder}/{folder_name}/{file.name}:/content'
+            upload_url = f'{url}/{default_user_folder}/{file.name}:/content'
 
         media_content = file.read()
 
@@ -177,57 +179,61 @@ class MicrosoftViewSet(viewsets.ViewSet):
     def create_folder(self, request):
         access_token = request.data.get('access_token')
         default_user_folder = self.request.user.folder_name
+        folder_name = request.data.get('folder_name')
         subfolder_name = request.data.get('subfolder_name')
 
         drive_id = config('drive_id')
 
         try:
             root_folder_id = get_folder_id_by_name(access_token, default_user_folder)
-            print(f'DEFAULT USER FOLDER ID::: {root_folder_id}')
+            url = f"https://graph.microsoft.com/v1.0/drives/{drive_id}/items/root:"
 
             headers = {
                 "Authorization": f"Bearer {access_token}",
                 "Content-Type": "application/json"
             }
 
-            if root_folder_id.get('folder_id') != '':
+            if folder_name:
                 if subfolder_name:
-                    normalized_subfolder_name = ''.join([c for c in unicodedata.normalize('NFD', subfolder_name) if not unicodedata.combining(c)])
-                    normalized_subfolder_name = normalized_subfolder_name.replace(' ', '').lower()
-
+                    normalized_folder_name = folder_name.replace(" ", "_")
+                    normalized_subfolder_name = subfolder_name.replace(" ", "_")
                     data = {
                         "name": normalized_subfolder_name,
                         "folder": {}
                     }
-
+                    
                     response = httpx.post(
-                        f"https://graph.microsoft.com/v1.0/drives/{drive_id}/items/{root_folder_id.get('folder_id')}/children",
+                        # f"https://graph.microsoft.com/v1.0/drives/{drive_id}/items/{root_folder_id.get('folder_id')}/{normalized_folder_name}:/children",
+                        f'{url}/{default_user_folder}/{normalized_folder_name}:/children',
                         headers=headers,
                         json=data
                     )
-
+                    if response.status_code == 201:
+                        return Response({"Message": "Subfolder created!"}, status=status.HTTP_201_CREATED)
+                    else:
+                        print(f"HTTP error: {response.text}")
+                        return Response({"Message": "Error creating subfolder."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                else:
+                    normalized_folder_name = folder_name.replace(" ", "_")
+                    data = {
+                        "name": normalized_folder_name,
+                        "folder": {}
+                    }
+                    response = httpx.post(
+                        # f"https://graph.microsoft.com/v1.0/drives/{drive_id}/items/{root_folder_id.get('folder_id')}/children",
+                        f'{url}/{default_user_folder}:/children',
+                        headers=headers,
+                        json=data
+                    )
                     if response.status_code == 201:
                         return Response({"Message": "Folder created!"}, status=status.HTTP_201_CREATED)
                     else:
                         print(f"HTTP error: {response.text}")
-                else:
-                    return Response({"Message": "A folder with that name already exists. Try again using another name!"}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({"Message": "Error creating folder."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
-                data = {
-                    "name": default_user_folder,
-                    "folder": {}
-                }
-
-                response = httpx.post(
-                    f"https://graph.microsoft.com/v1.0/drives/{drive_id}/root/children",
-                    headers=headers,
-                    json=data
-                )
-
-                if response.status_code == 201:
-                    return Response({"Message": "Folder created!"}, status=status.HTTP_201_CREATED)
-                else:
-                    print(f"HTTP error: {response.text}")
-        except Exception:
+                return Response({"Message": "Folder name is required."}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
             traceback.print_exc()
-            return Response({"Message": "An error occurred while creating the folder."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"Message": f"An error occurred while creating the folder: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+

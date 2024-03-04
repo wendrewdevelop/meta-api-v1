@@ -75,11 +75,11 @@ class UserViewset(ModelViewSet):
                     "folder": {}
                 }
             )
+            print(response)
             return Response(serializer.data)
         except Exception as error:
             print(error)
         
-
     def destroy(self, request, *args, **kwargs):
         return super(UserViewset, self).destroy(request, *args, **kwargs)
 
