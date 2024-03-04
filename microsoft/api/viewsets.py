@@ -134,8 +134,8 @@ class MicrosoftViewSet(viewsets.ViewSet):
     
     @action(detail=False, methods=['get'])
     def download_file(self, request):
+        default_user_folder = self.request.user.folder_name
         access_token = self.request.query_params.get('access_token')
-        folder = self.request.query_params.get('folder')
         item_name = self.request.query_params.get('item_name')
         subfolder_name = self.request.query_params.get('subfolder_name')
 
@@ -143,7 +143,6 @@ class MicrosoftViewSet(viewsets.ViewSet):
         drive_id = config('drive_id')
 
         # Adjust the logic based on your requirements
-        folder_id = get_folder_id_by_name(access_token, folder)
         url = f"https://graph.microsoft.com/v1.0/drives/{drive_id}/items/root:"
 
         headers = {
@@ -151,12 +150,12 @@ class MicrosoftViewSet(viewsets.ViewSet):
         }
 
         if subfolder_name:
-            upload_url = f'{url}/{folder}/{subfolder_name}:/children/{item_name}'
+            download_url = f'{url}/{default_user_folder}/{subfolder_name}:/children/{item_name}'
         else:
-            upload_url = f'{url}/{folder}:/children/{item_name}'
+            download_url = f'{url}/{default_user_folder}:/children/{item_name}'
 
         try:
-            with requests.get(upload_url, headers=headers) as response:
+            with requests.get(download_url, headers=headers) as response:
                 response.raise_for_status()
 
                 response_data = response.json()
