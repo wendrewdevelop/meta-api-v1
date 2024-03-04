@@ -11,6 +11,7 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from django.contrib.auth import login
 from rest_framework.decorators import action
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from user.models import User
 from user.api.serializers import UserSerializer, CustomAuthTokenSerializer
 
@@ -91,18 +92,26 @@ class UserViewset(ModelViewSet):
         except Exception as e:
             return Response({"message": "Erro ao gerar a senha temporaria."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['put'])
     def update_password(self, request, pk=None):
-        user = self.get_object()
+        user = User.objects.get(id=pk)
         password = request.data.get('password')
 
         if password:
             hashed_password = make_password(password)
-            user.set_password(hashed_password)
+            user.password = hashed_password
             user.save()
-            return Response({"message": "Password updated successfully."}, status=status.HTTP_200_OK)
+
+            # Invalidate existing tokens by deleting them
+            Token.objects.filter(user=user).delete()
+
+            # Generate a new token for the user
+            new_token, _ = Token.objects.get_or_create(user=user)
+
+            return Response({"message": "Password updated successfully.", "token": new_token.key}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "New password not provided."}, status=status.HTTP_400_BAD_REQUEST)
+
     
 
 class CustomObtainAuthToken(ObtainAuthToken):
@@ -111,9 +120,7 @@ class CustomObtainAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(
             data=request.data, 
-            context={
-                "request": request
-            }
+            context={"request": request}
         )
         serializer.is_valid(raise_exception=True)
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
