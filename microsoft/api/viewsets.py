@@ -75,12 +75,12 @@ class MicrosoftViewSet(viewsets.ViewSet):
         
         default_user_folder = self.request.user.folder_name
         access_token = self.request.data.get('access_token')
-        folder_name = self.request.data['folder_name']
+        folder_name = self.request.data.get('folder_name', None)
         uploaded_at = self.request.data['uploaded_at']
         expires_at = self.request.data['expires_at']
         period_to_expiration = self.request.data['period_to_expiration']
         file = self.request.data['file']
-        subfolder_name = self.request.data.get('subfolder_name')
+        subfolder_name = self.request.data.get('subfolder_name', None)
 
         drive_id = config('drive_id')
 
@@ -119,7 +119,7 @@ class MicrosoftViewSet(viewsets.ViewSet):
                 metadata = {
                     "user_id": self.request.user.id,
                     "file_name": file.name,
-                    "folder_name": folder_name,
+                    # "folder_name": folder_name,
                     "uploaded_at": uploaded_at,
                     "expires_at": expires_at,
                 }
