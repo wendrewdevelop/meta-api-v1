@@ -173,6 +173,8 @@ class MicrosoftViewSet(viewsets.ViewSet):
         else:
             download_url = f'{url}/{default_user_folder}:/children/{item_name}'
 
+            
+
         print(f'DOWNLOAD URL::: {download_url}')
 
         try:
@@ -248,5 +250,40 @@ class MicrosoftViewSet(viewsets.ViewSet):
         except Exception as e:
             traceback.print_exc()
             return Response({"Message": f"An error occurred while creating the folder: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    @action(detail=False, methods=['get'])
+    def list_folders(self, request):
+        access_token = request.query_params.get('access_token')
+        default_user_folder = self.request.user.folder_name
+        print(default_user_folder)
+        drive_id = config('drive_id')
+        url_base = f"https://graph.microsoft.com/v1.0/drives/{drive_id}/items/root:"
+
+        try:
+            root_folder_id = get_folder_id_by_name(access_token, default_user_folder)
+            url = f"{url_base}/{default_user_folder}:/children"
+            headers = {
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/json"
+            }
+
+
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+
+                folders = [item for item in data["value"]]
+                
+                if folders:
+                    for folder in folders:
+                        return Response({"Message": f'{folder["name"]}'}, status=status.HTTP_200_OK)
+                else:
+                    return Response({"Message": f'{[]}'}, status=status.HTTP_200_OK)
+            else:
+                return Response({"Message": f'{response.text}'}, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            traceback.print_exc()
+            return Response({"Message": f"An error occurred while list folders: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
