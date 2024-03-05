@@ -3,6 +3,7 @@ import requests
 import traceback
 import unicodedata
 from decouple import config
+from django.http import JsonResponse
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, permission_classes
 from rest_framework.response import Response
@@ -278,9 +279,9 @@ class MicrosoftViewSet(viewsets.ViewSet):
                     for folder in folders:
                         folder_name = folder['name']
                         folder_names.append(folder_name)
-                    return Response({"Message": f'{folder_names}'}, status=status.HTTP_200_OK)
+                    return JsonResponse({"Message": folder_names}, status=200)
                 else:
-                    return Response({"Message": f'{[]}'}, status=status.HTTP_200_OK)
+                    return JsonResponse({"Message": []}, status=200)
             else:
                 return Response({"Message": f'{response.text}'}, status=status.HTTP_201_CREATED)
             
