@@ -253,9 +253,9 @@ class MicrosoftViewSet(viewsets.ViewSet):
         
     @action(detail=False, methods=['get'])
     def list_folders(self, request):
+        folder_names = [] 
         access_token = request.query_params.get('access_token')
         default_user_folder = self.request.user.folder_name
-        print(default_user_folder)
         drive_id = config('drive_id')
         url_base = f"https://graph.microsoft.com/v1.0/drives/{drive_id}/items/root:"
 
@@ -276,7 +276,9 @@ class MicrosoftViewSet(viewsets.ViewSet):
                 
                 if folders:
                     for folder in folders:
-                        return Response({"Message": f'{folder["name"]}'}, status=status.HTTP_200_OK)
+                        folder_name = folder['name']
+                        folder_names.append(folder_name)
+                    return Response({"Message": f'{folder_names}'}, status=status.HTTP_200_OK)
                 else:
                     return Response({"Message": f'{[]}'}, status=status.HTTP_200_OK)
             else:
