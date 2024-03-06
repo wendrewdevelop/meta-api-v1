@@ -194,6 +194,16 @@ SPECTACULAR_SETTINGS = {
     # OTHER SETTINGS
 }
 
+REST_FRAMEWORK = {
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '10000/day',
+        'user_individual': '10000/day'
+    }
+}
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.office365.com' #'smtp.uhserver.com'
 EMAIL_PORT = 587

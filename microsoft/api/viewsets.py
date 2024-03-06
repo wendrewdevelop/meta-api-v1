@@ -9,6 +9,7 @@ from rest_framework.decorators import action, permission_classes
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAdminUser, AllowAny
+from rest_framework.throttling import UserRateThrottle
 from user.permissions import UserPermission
 from microsoft.api.serializers import MicrosoftSerializer
 from files.models import File
@@ -16,6 +17,8 @@ from meta.utils import get_folder_id_by_name, list_items_in_drive
 
 
 class MicrosoftViewSet(viewsets.ViewSet):
+    throttle_classes = [UserRateThrottle]
+    throttle_scope = 'user_individual' 
     serializer_class = MicrosoftSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [UserPermission]
@@ -173,8 +176,6 @@ class MicrosoftViewSet(viewsets.ViewSet):
                 download_url = f'{url}/{default_user_folder}/{folder_name}:/children/{item_name}'
         else:
             download_url = f'{url}/{default_user_folder}:/children/{item_name}'
-
-            
 
         print(f'DOWNLOAD URL::: {download_url}')
 

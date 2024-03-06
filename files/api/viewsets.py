@@ -2,12 +2,15 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
 from files.models import File
 from files.api.serializers import FileSerializer
 from user.permissions import UserPermission
 
 
 class FileViewset(ModelViewSet):
+    throttle_classes = [UserRateThrottle]
+    throttle_scope = 'user_individual' 
     serializer_class = FileSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [UserPermission]

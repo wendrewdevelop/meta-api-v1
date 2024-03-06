@@ -14,11 +14,14 @@ from django.contrib.auth import login
 from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from rest_framework.throttling import UserRateThrottle
 from user.models import User
 from user.api.serializers import UserSerializer, CustomAuthTokenSerializer
 
 
 class UserViewset(ModelViewSet):
+    throttle_classes = [UserRateThrottle]
+    throttle_scope = 'user_individual' 
     serializer_class = UserSerializer
     #authentication_classes = [TokenAuthentication]
     #permission_classes = [IsAdminUser]
@@ -135,6 +138,8 @@ class UserViewset(ModelViewSet):
 
     
 class CustomObtainAuthToken(ObtainAuthToken):
+    throttle_classes = [UserRateThrottle]
+    throttle_scope = 'user_individual' 
     serializer_class = CustomAuthTokenSerializer
 
     def post(self, request, *args, **kwargs):
