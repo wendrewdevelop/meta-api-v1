@@ -49,3 +49,15 @@ class FileViewset(ModelViewSet):
         except Exception as error:
             print(error)
             return Response({"Message": f"Status do arquivo ({file_object.file_name}) não pode ser atualizado!"})
+        
+    @action(detail=True, methods=["GET"])
+    def get_user_files(self, request, pk=None):
+        # user_id = request.data.get('user_id')
+        file_instance = File.objects.filter(user_id=pk).all()
+        serializer = FileSerializer(file_instance, many=True)  # Serializa os objetos File
+
+        try:
+            return Response(serializer.data)
+        except Exception as error:
+            print(error)
+            return Response({"Message": "Erro ao retornar as informações do arquivo", "Erro": f"{error}"})
