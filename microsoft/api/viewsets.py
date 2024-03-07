@@ -78,7 +78,7 @@ class MicrosoftViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['post'])
     def upload_file(self, request):
         
-        default_user_folder = self.request.user.folder_name
+        default_user_folder = self.request.data.get('default_user_folder')
         access_token = self.request.data.get('access_token')
         folder_name = self.request.data.get('folder_name', None)
         uploaded_at = self.request.data['uploaded_at']
@@ -140,7 +140,7 @@ class MicrosoftViewSet(viewsets.ViewSet):
         access_token = request.query_params.get('access_token', '')
         folder = request.query_params.get('folder', '')
         subfolder = request.query_params.get('subfolder', '')
-        default_user_folder = self.request.user.folder_name
+        default_user_folder = request.query_params.get('default_user_folder', '')
 
         items_in_drive = list_items_in_drive(access_token, folder, default_user_folder, subfolder)
 
@@ -275,7 +275,7 @@ class MicrosoftViewSet(viewsets.ViewSet):
     def list_folders(self, request):
         folder_names = [] 
         access_token = request.query_params.get('access_token')
-        default_user_folder = self.request.user.folder_name
+        default_user_folder = request.query_params.get('default_user_folder')
         drive_id = config('drive_id')
         url_base = f"https://graph.microsoft.com/v1.0/drives/{drive_id}/items/root:"
 
@@ -307,62 +307,3 @@ class MicrosoftViewSet(viewsets.ViewSet):
         except Exception as e:
             traceback.print_exc()
             return Response({"Message": f"An error occurred while list folders: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-    @action(detail=False, methods=['post'])
-    def admin_upload_file(self, request):
-        
-        default_user_folder = self.request.user.folder_name
-        access_token = self.request.data.get('access_token')
-        folder_name = self.request.data.get('folder_name', None)
-        uploaded_at = self.request.data['uploaded_at']
-        expires_at = self.request.data['expires_at']
-        period_to_expiration = self.request.data['period_to_expiration']
-        file = self.request.data['file']
-        subfolder_name = self.request.data.get('subfolder_name', None)
-        user_id = self.request.data.get('user_id', None)
-        drive_id = config('drive_id')
-        upload_url = ''
-        url = f"https://graph.microsoft.com/v1.0/drives/{drive_id}/items/root:"
-
-        folder_id = get_folder_id_by_name(access_token, folder_name)
-        if folder_id is None:
-            return Response("Folder not found.", status=status.HTTP_404_NOT_FOUND)
-
-        if folder_name:
-            if subfolder_name:
-                upload_url = f'{url}/{default_user_folder}/{folder_name}/{subfolder_name}/{file.name}:/content'
-            else:
-                upload_url = f'{url}/{default_user_folder}/{folder_name}/{file.name}:/content'
-        else:
-            upload_url = f'{url}/{default_user_folder}/{file.name}:/content'
-
-        media_content = file.read()
-
-        try:
-            with httpx.Client() as client:
-                headers = {
-                    'Authorization': f'Bearer {access_token}',
-                    'Content-Type': 'application/octet-stream',  # Set content type for file upload
-                }
-
-                response = client.put(
-                    upload_url,
-                    headers=headers,
-                    content=media_content,
-                )
-                print(response.text)
-
-            if response.status_code == 201 or response.status_code == 200:
-                metadata = {
-                    "user_id": self.request.user.id,
-                    "file_name": file.name,
-                    # "folder_name": folder_name,
-                    "uploaded_at": uploaded_at,
-                    "expires_at": expires_at,
-                }
-                File.register_file(files=metadata)
-                return Response("File uploaded successfully.", status=status.HTTP_201_CREATED)
-            else:
-                return Response(f"Failed to upload file: {response.text}", status=status.HTTP_201_CREATED)
-        except Exception as error:
-            return Response(f"Failed to upload file: {str(error)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
