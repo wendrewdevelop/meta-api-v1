@@ -15,7 +15,8 @@ class UserSerializer(serializers.ModelSerializer):
             'email', 
             'password',
             'cpf_cnpj',
-            'phone'
+            'phone',
+            'birthday'
         )
         extra_kwargs = {'password': {'write_only': True}}
 

@@ -36,6 +36,10 @@ class User(AbstractUser):
         null=True,
         blank=True
     )
+    birthday = models.DateField(
+        null=True,
+        blank=True
+    )
     temporary_password = models.CharField(max_length=128, null=True, blank=True)
 
     objects = CustomUserManager()

@@ -66,7 +66,8 @@ class UserViewset(ModelViewSet):
                 last_name=data['last_name'],
                 folder_name=default_user_folder.replace(" ", "_"),
                 phone=data['phone'],
-                cpf_cnpj=data['cpf_cnpj']
+                cpf_cnpj=data['cpf_cnpj'],
+                birthday=data['birthday']
             )
             serializer = UserSerializer(user)
 
@@ -135,6 +136,18 @@ class UserViewset(ModelViewSet):
             return Response({"message": "Password updated successfully.", "token": new_token.key}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "New password not provided."}, status=status.HTTP_400_BAD_REQUEST)
+        
+    @action(detail=True, methods=['put'])
+    def update_birthday(self, request, pk=None):
+        user_instance = User.objects.get(id=pk)
+
+        try:
+            user_instance.birthday = request.data.get('birthday')
+            user_instance.save()
+            return Response({"Message": "Data de aniversario atualizada com sucesso."}, status=status.HTTP_200_OK)
+        except Exception as error:
+            return Response({"Message": error}, status=status.HTTP_400_BAD_REQUEST)
+
 
     
 class CustomObtainAuthToken(ObtainAuthToken):
