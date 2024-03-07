@@ -218,19 +218,11 @@ class MicrosoftViewSet(viewsets.ViewSet):
                         }
                         
                         response = httpx.post(
-                            # f"https://graph.microsoft.com/v1.0/drives/{drive_id}/items/{root_folder_id.get('folder_id')}/{normalized_folder_name}:/children",
                             f'{url}/{default_user_folder}/{normalized_folder_name}:/children',
                             headers=headers,
                             json=data
                         )
                         if response.status_code == 201:
-                            metadata = {
-                                "user_id": self.request.user.id,
-                                "folder_name": folder_name.replace(' ', '_'),
-                                "folder_type": "subfolder",
-                                "user_root_folder": default_user_folder
-                            }
-                            Folder.register_folder(folders=metadata)
                             return Response({"Message": "Subfolder created!"}, status=status.HTTP_201_CREATED)
                         else:
                             print(f"HTTP error: {response.text}")
@@ -242,19 +234,11 @@ class MicrosoftViewSet(viewsets.ViewSet):
                             "folder": {}
                         }
                         response = httpx.post(
-                            # f"https://graph.microsoft.com/v1.0/drives/{drive_id}/items/{root_folder_id.get('folder_id')}/children",
                             f'{url}/{default_user_folder}:/children',
                             headers=headers,
                             json=data
                         )
                         if response.status_code == 201:
-                            metadata = {
-                                "user_id": self.request.user.id,
-                                "folder_name": folder_name,
-                                "folder_type": "folder",
-                                "user_root_folder": default_user_folder
-                            }
-                            Folder.register_folder(folders=metadata)
                             return Response({"Message": "Folder created!"}, status=status.HTTP_201_CREATED)
                         else:
                             print(f"HTTP error: {response.text}")
