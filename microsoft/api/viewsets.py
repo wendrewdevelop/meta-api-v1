@@ -91,10 +91,7 @@ class MicrosoftViewSet(viewsets.ViewSet):
 
         upload_url = ''
         url = f"https://graph.microsoft.com/v1.0/drives/{drive_id}/items/root:"
-
-        folder_id = get_folder_id_by_name(access_token, folder_name)
-        if folder_id is None:
-            return Response("Folder not found.", status=status.HTTP_404_NOT_FOUND)
+        root_folder_id = get_folder_id_by_name(access_token, default_user_folder)
 
         if folder_name:
             if subfolder_name:
@@ -124,7 +121,6 @@ class MicrosoftViewSet(viewsets.ViewSet):
                 metadata = {
                     "user_id": self.request.user.id,
                     "file_name": file.name,
-                    # "folder_name": folder_name,
                     "uploaded_at": uploaded_at,
                     "expires_at": expires_at,
                 }
