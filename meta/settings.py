@@ -50,7 +50,8 @@ PROJECT_APP = [
     'notifications',
     'files',
     'user',
-    'microsoft'
+    'microsoft',
+    'folders'
 ]
 
 THIRD_PARTY_APPS = [

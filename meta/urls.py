@@ -33,6 +33,7 @@ from user.api.viewsets import (
     CustomObtainAuthToken
 )
 from notifications.api.viewsets import NotificationViewset
+from folders.api.viewsets import FolderViewset
 
 
 router = routers.DefaultRouter()
@@ -56,6 +57,12 @@ router.register(
     NotificationViewset,
     basename='Notification'
 )
+router.register(
+    r'folder',
+    FolderViewset,
+    basename='Folder'
+)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
