@@ -38,7 +38,7 @@ class NotificationViewset(ModelViewSet):
     def send(self, request):
         query = File.objects.filter(
             user=self.request.user,
-            expire_notification__gte=date.today()
+            expire_notification__lte=date.today()
         )
         if query:
             for data in query:
