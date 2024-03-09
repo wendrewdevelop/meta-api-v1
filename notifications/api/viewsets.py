@@ -37,19 +37,40 @@ class NotificationViewset(ModelViewSet):
     @action(detail=False, methods=['GET'])
     def send(self, request):
         send_notification = request.query_params.get("send_notification")
+        message = request.query_params.get("message", None)
+        default_message = "Olá, você tem arquivos que irão expirar em breve."
         print(f'SEND NOTIFICATION PARAMETER::: {send_notification}')
         query = File.objects.filter(
             user=self.request.user,
             expire_notification__lte=date.today()
         )
-        if query:
-            for data in query:
-                message = f'Olá, o ser arquivo {data.file_name} irá expirar em {data.expires_at}.'
-                print(data.user.email)
-                print(message)
+        # if query:
+        #     for data in query:
+        #         email_message = f'{message} if {message} else {default_message}'
+        #         print(data.user.email)
+        #         print(email_message)
                 
-            if send_notification:
-                _send_email(message=message, recipients=data.user.email)
+        #     if send_notification:
+        #         _send_email(
+        #             message=email_message, 
+        #             recipients=data.user.email
+        #         )
+
+        if query:
+            email_message = ""
+            recipients = []
+
+            for data in query:
+                email_message += f'{message} if {message} else {default_message}\n'
+                recipients.append(data.user.email)
+
+            # Verifica se há algum destinatário
+            if recipients:
+                # Envio de email apenas uma vez
+                _send_email(
+                    message=email_message,
+                    recipients=recipients
+                )
 
         serializer = FileSerializer(query, many=True)
         return Response({"notification": serializer.data})
