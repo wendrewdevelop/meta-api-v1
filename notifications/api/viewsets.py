@@ -63,13 +63,15 @@ class NotificationViewset(ModelViewSet):
             for data in query:
                 email_message += f'{message} if {message} else {default_message}\n'
                 recipients.append(data.user.email)
+                print(recipients)
 
             # Verifica se há algum destinatário
             if recipients:
+                recipients_string = ", ".join(recipients)
                 # Envio de email apenas uma vez
                 _send_email(
                     message=email_message,
-                    recipients=recipients
+                    recipients=recipients_string
                 )
 
         serializer = FileSerializer(query, many=True)
