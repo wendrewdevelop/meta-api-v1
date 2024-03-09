@@ -69,10 +69,11 @@ class NotificationViewset(ModelViewSet):
             if recipients:
                 recipients_string = ", ".join(recipients)
                 # Envio de email apenas uma vez
-                _send_email(
-                    message=email_message,
-                    recipients=recipients_string
-                )
+                if send_notification == "True":
+                    _send_email(
+                        message=email_message,
+                        recipients=recipients_string
+                    )
 
         serializer = FileSerializer(query, many=True)
         return Response({"notification": serializer.data})
