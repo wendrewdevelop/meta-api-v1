@@ -36,7 +36,8 @@ class NotificationViewset(ModelViewSet):
 
     @action(detail=False, methods=['GET'])
     def send(self, request):
-        send_notification = request.data.get("send_notification")
+        send_notification = request.query_params.get("send_notification")
+        print(f'SEND NOTIFICATION PARAMETER::: {send_notification}')
         query = File.objects.filter(
             user=self.request.user,
             expire_notification__lte=date.today()
