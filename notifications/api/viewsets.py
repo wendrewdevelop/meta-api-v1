@@ -36,6 +36,7 @@ class NotificationViewset(ModelViewSet):
 
     @action(detail=False, methods=['GET'])
     def send(self, request):
+        send_notification = request.data.get("send_notification")
         query = File.objects.filter(
             user=self.request.user,
             expire_notification__lte=date.today()
@@ -45,6 +46,8 @@ class NotificationViewset(ModelViewSet):
                 message = f'Olá, o ser arquivo {data.file_name} irá expirar em {data.expires_at}.'
                 print(data.user.email)
                 print(message)
+                
+            if send_notification:
                 _send_email(message=message, recipients=data.user.email)
 
         serializer = FileSerializer(query, many=True)

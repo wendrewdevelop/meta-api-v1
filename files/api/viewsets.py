@@ -52,7 +52,6 @@ class FileViewset(ModelViewSet):
         
     @action(detail=True, methods=["GET"])
     def get_user_files(self, request, pk=None):
-        # user_id = request.data.get('user_id')
         file_instance = File.objects.filter(user_id=pk).all()
         serializer = FileSerializer(file_instance, many=True)  # Serializa os objetos File
 
