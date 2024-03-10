@@ -77,7 +77,7 @@ class MicrosoftViewSet(viewsets.ViewSet):
         
     @action(detail=False, methods=['post'])
     def upload_file(self, request):
-        
+        user_id = self.request.data.get('user_id')
         default_user_folder = self.request.data.get('default_user_folder')
         access_token = self.request.data.get('access_token')
         folder_name = self.request.data.get('folder_name', None)
@@ -119,7 +119,7 @@ class MicrosoftViewSet(viewsets.ViewSet):
 
             if response.status_code == 201 or response.status_code == 200:
                 metadata = {
-                    "user_id": self.request.user.id,
+                    "user_id": user_id,
                     "file_name": file.name,
                     "uploaded_at": uploaded_at,
                     "expires_at": expires_at,
