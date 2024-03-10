@@ -161,18 +161,18 @@ class MicrosoftViewSet(viewsets.ViewSet):
             "Authorization": f"Bearer {access_token}"
         }
 
-        # if subfolder_name:
-        #     download_url = f'{url}/{default_user_folder}/{subfolder_name}:/children/{item_name}'
-        # else:
-        #     download_url = f'{url}/{default_user_folder}:/children/{item_name}'
-
-        if folder_name:
-            if subfolder_name:
-                download_url = f'{url}/{default_user_folder}/{folder_name}/{subfolder_name}:/children/{item_name}'
-            else:
-                download_url = f'{url}/{default_user_folder}/{folder_name}:/children/{item_name}'
+        if subfolder_name:
+            download_url = f'{url}/{default_user_folder}/{subfolder_name}:/children/{item_name}'
         else:
             download_url = f'{url}/{default_user_folder}:/children/{item_name}'
+
+        # if folder_name:
+        #     if subfolder_name:
+        #         download_url = f'{url}/{default_user_folder}/{folder_name}/{subfolder_name}:/children/{item_name}'
+        #     else:
+        #         download_url = f'{url}/{default_user_folder}/{folder_name}:/children/{item_name}'
+        # else:
+        #     download_url = f'{url}/{default_user_folder}:/children/{item_name}'
 
         print(f'DOWNLOAD URL::: {download_url}')
 
