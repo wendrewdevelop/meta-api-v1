@@ -31,7 +31,8 @@ ALLOWED_HOSTS = [
 	"https://api.metasolucoesambientais.com.br",
 	"127.0.0.1",
 	"api.metasolucoesambientais.com.br:8000",
-	"api.metasolucoesambientais.com.br"
+	"api.metasolucoesambientais.com.br",
+	"app.metasolucoesambientais.com.br"
 ]
 
 
@@ -218,7 +219,5 @@ EMAIL_USE_OAUTH2 = True
 
 # CORS SETUP
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = [
-    'https://app.metasolucoesambientais.com.br',
-    'https://api.metasolucoesambientais.com.br/auth/login/',
-]
+CORS_ORIGIN_WHITELIST = []
+CORS_ALLOW_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
