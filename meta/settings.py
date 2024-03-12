@@ -57,7 +57,8 @@ PROJECT_APP = [
 THIRD_PARTY_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
-    'drf_spectacular'
+    'drf_spectacular',
+    'corsheaders'
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + PROJECT_APP + THIRD_PARTY_APPS
@@ -70,6 +71,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'meta.urls'
@@ -205,6 +207,7 @@ REST_FRAMEWORK = {
     }
 }
 
+# EMAIL SETUP 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.office365.com' #'smtp.uhserver.com'
 EMAIL_PORT = 587
@@ -212,3 +215,6 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'wendrewoliveira@onemancompany682.onmicrosoft.com' #'notificacao@metasolucoesambientais.com.br'
 EMAIL_HOST_PASSWORD = 'Mynameisdrew1_' #'Meta33650913@'
 EMAIL_USE_OAUTH2 = True
+
+# CORS SETUP
+CORS_ORIGIN_ALLOW_ALL = True

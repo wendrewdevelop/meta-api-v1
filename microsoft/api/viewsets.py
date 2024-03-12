@@ -107,7 +107,7 @@ class MicrosoftViewSet(viewsets.ViewSet):
             with httpx.Client() as client:
                 headers = {
                     'Authorization': f'Bearer {access_token}',
-                    'Content-Type': 'application/octet-stream',  # Set content type for file upload
+                    'Content-Type': 'application/octet-stream',
                 }
 
                 response = client.put(
