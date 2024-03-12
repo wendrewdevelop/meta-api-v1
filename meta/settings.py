@@ -218,3 +218,7 @@ EMAIL_USE_OAUTH2 = True
 
 # CORS SETUP
 CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = [
+    'https://app.metasolucoesambientais.com.br',
+    'https://api.metasolucoesambientais.com.br/auth/login/',
+]
