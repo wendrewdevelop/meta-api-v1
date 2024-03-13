@@ -67,7 +67,8 @@ class UserViewset(ModelViewSet):
                 folder_name=default_user_folder.replace(" ", "_"),
                 phone=data['phone'],
                 cpf_cnpj=data['cpf_cnpj'],
-                birthday=data['birthday']
+                birthday=data['birthday'],
+                is_staff=data.get('is_staff')
             )
             serializer = UserSerializer(user)
 

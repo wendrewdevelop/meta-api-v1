@@ -26,14 +26,7 @@ SECRET_KEY = 'django-insecure-%k#v#lgq#f*prk8=1o*ksnc1axkdl&0ofv!#1dpco8f+swdtsh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-	"149.100.142.57",
-	"https://api.metasolucoesambientais.com.br",
-	"127.0.0.1",
-	"api.metasolucoesambientais.com.br:8000",
-	"api.metasolucoesambientais.com.br",
-	"app.metasolucoesambientais.com.br"
-]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
