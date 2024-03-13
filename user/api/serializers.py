@@ -72,7 +72,9 @@ class CustomAuthTokenSerializer(serializers.Serializer):
                     "is_staff": user.is_staff,
                     "folder_name": user.folder_name,
                     "phone": user.phone,
-                    "cpf_cnpj": user.cpf_cnpj
+                    "cpf_cnpj": user.cpf_cnpj,
+                    "birthday": user.birthday,
+                    "is_staff": user.is_staff
                 }
             }
 

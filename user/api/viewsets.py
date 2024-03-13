@@ -68,7 +68,7 @@ class UserViewset(ModelViewSet):
                 phone=data['phone'],
                 cpf_cnpj=data['cpf_cnpj'],
                 birthday=data['birthday'],
-                is_staff=data.get('is_staff')
+                is_staff=data.get('is_staff', False)
             )
             serializer = UserSerializer(user)
 
